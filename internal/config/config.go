@@ -88,6 +88,9 @@ type Config struct {
 	// AmpCode contains Amp CLI upstream configuration, management restrictions, and model mappings.
 	AmpCode AmpCode `yaml:"ampcode" json:"ampcode"`
 
+	// OAuth defines OAuth client settings for providers requiring login flows.
+	OAuth OAuthConfig `yaml:"oauth" json:"oauth"`
+
 	// OAuthExcludedModels defines per-provider global model exclusions applied to OAuth/file-backed auth entries.
 	OAuthExcludedModels map[string][]string `yaml:"oauth-excluded-models,omitempty" json:"oauth-excluded-models,omitempty"`
 
@@ -118,6 +121,20 @@ type RemoteManagement struct {
 	// PanelGitHubRepository overrides the GitHub repository used to fetch the management panel asset.
 	// Accepts either a repository URL (https://github.com/org/repo) or an API releases endpoint.
 	PanelGitHubRepository string `yaml:"panel-github-repository"`
+}
+
+// OAuthConfig defines OAuth client settings for providers using OAuth.
+type OAuthConfig struct {
+	// Gemini holds the OAuth client configuration for Gemini login flows.
+	Gemini OAuthClient `yaml:"gemini" json:"gemini"`
+	// Antigravity holds the OAuth client configuration for Antigravity login flows.
+	Antigravity OAuthClient `yaml:"antigravity" json:"antigravity"`
+}
+
+// OAuthClient describes an OAuth client ID/secret pair.
+type OAuthClient struct {
+	ClientID     string `yaml:"client-id" json:"client-id"`
+	ClientSecret string `yaml:"client-secret" json:"client-secret"`
 }
 
 // QuotaExceeded defines the behavior when API quota limits are exceeded.
