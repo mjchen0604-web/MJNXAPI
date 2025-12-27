@@ -191,6 +191,10 @@ func EnsureLatestManagementHTML(ctx context.Context, staticDir string, proxyURL 
 		log.Debug("management asset sync skipped: control panel disabled by configuration")
 		return
 	}
+	if strings.TrimSpace(panelRepository) == "" {
+		log.Debug("management asset sync skipped: panel repository not configured")
+		return
+	}
 
 	staticDir = strings.TrimSpace(staticDir)
 	if staticDir == "" {

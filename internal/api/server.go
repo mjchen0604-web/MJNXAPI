@@ -617,6 +617,12 @@ func (s *Server) serveManagementControlPanel(c *gin.Context) {
 		c.AbortWithStatus(http.StatusNotFound)
 		return
 	}
+	if strings.TrimSpace(cfg.RemoteManagement.PanelGitHubRepository) == "" {
+		if embedded := managementasset.EmbeddedHTML(); len(embedded) > 0 {
+			c.Data(http.StatusOK, "text/html; charset=utf-8", embedded)
+			return
+		}
+	}
 
 	if _, err := os.Stat(filePath); err != nil {
 		if os.IsNotExist(err) {
