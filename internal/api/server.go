@@ -621,6 +621,10 @@ func (s *Server) serveManagementControlPanel(c *gin.Context) {
 	if _, err := os.Stat(filePath); err != nil {
 		if os.IsNotExist(err) {
 			go managementasset.EnsureLatestManagementHTML(context.Background(), managementasset.StaticDir(s.configFilePath), cfg.ProxyURL, cfg.RemoteManagement.PanelGitHubRepository)
+			if embedded := managementasset.EmbeddedHTML(); len(embedded) > 0 {
+				c.Data(http.StatusOK, "text/html; charset=utf-8", embedded)
+				return
+			}
 			c.AbortWithStatus(http.StatusNotFound)
 			return
 		}
