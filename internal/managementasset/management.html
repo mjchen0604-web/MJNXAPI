@@ -48,13 +48,33 @@ Please change the parent <Route path="${M}"> to <Route path="${M==="/"?"*":`${M}
         var NAV_MARK = "data-codex-nav";
         var CODex_LABEL = "Codex 配置";
         var TARGET_HASH = "#/ai-providers";
-        function findNavLinkByText(text) {
-          var links = document.querySelectorAll("a");
-          for (var i = 0; i < links.length; i++) {
-            var t = (links[i].textContent || "").trim();
-            if (t === text) return links[i];
+        function findLabelNode(text) {
+          var nodes = document.querySelectorAll("a,button,li,div,span");
+          for (var i = 0; i < nodes.length; i++) {
+            var node = nodes[i];
+            var t = (node.textContent || "").trim();
+            if (t === text) return node;
           }
           return null;
+        }
+        function findClickableAncestor(node) {
+          if (!node) return null;
+          var click = node.closest("a,button,li,[role='link'],[role='menuitem']");
+          if (click) return click;
+          var parent = node.parentElement;
+          if (
+            parent &&
+            (parent.getAttribute("role") === "button" ||
+              parent.getAttribute("role") === "link" ||
+              parent.tabIndex >= 0 ||
+              typeof parent.onclick === "function")
+          )
+            return parent;
+          return node;
+        }
+        function findNavItemByText(text) {
+          var label = findLabelNode(text);
+          return findClickableAncestor(label);
         }
         function setLinkLabel(link, text) {
           var nodes = link.querySelectorAll("*");
@@ -95,13 +115,18 @@ Please change the parent <Route path="${M}"> to <Route path="${M==="/"?"*":`${M}
         }
         function ensureCodexNav() {
           if (document.querySelector("[" + NAV_MARK + "='1']")) return;
-          var anchor = findNavLinkByText("配置管理") || findNavLinkByText("AI 提供商") || findNavLinkByText("仪表盘");
+          var anchor =
+            findNavItemByText("配置管理") ||
+            findNavItemByText("AI 提供商") ||
+            findNavItemByText("仪表盘");
           if (!anchor) return;
           var clone = anchor.cloneNode(true);
           clone.setAttribute(NAV_MARK, "1");
-          clone.setAttribute("href", TARGET_HASH);
+          var linkEl = clone.tagName === "A" ? clone : clone.querySelector("a");
+          if (linkEl) linkEl.setAttribute("href", TARGET_HASH);
           setLinkLabel(clone, CODex_LABEL);
-          clone.addEventListener("click", function (event) {
+          var clickEl = linkEl || clone;
+          clickEl.addEventListener("click", function (event) {
             event.preventDefault();
             gotoCodexConfig();
           });
