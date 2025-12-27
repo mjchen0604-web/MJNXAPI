@@ -23,6 +23,7 @@ RUN mkdir -p /CLIProxyAPI /data
 COPY --from=builder ./app/CLIProxyAPI /CLIProxyAPI/CLIProxyAPI
 
 COPY config.example.yaml /CLIProxyAPI/config.example.yaml
+COPY internal/managementasset/management.html /CLIProxyAPI/management.html
 COPY docker/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
