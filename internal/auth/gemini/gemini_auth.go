@@ -190,8 +190,8 @@ func (g *GeminiAuth) createTokenStorage(ctx context.Context, config *oauth2.Conf
 	}
 
 	ifToken["token_uri"] = "https://oauth2.googleapis.com/token"
-	ifToken["client_id"] = clientID
-	ifToken["client_secret"] = clientSecret
+	ifToken["client_id"] = config.ClientID
+	ifToken["client_secret"] = config.ClientSecret
 	ifToken["scopes"] = geminiOauthScopes
 	ifToken["universe_domain"] = "googleapis.com"
 
