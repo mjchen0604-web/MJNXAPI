@@ -43,5 +43,83 @@ Please change the parent <Route path="${M}"> to <Route path="${M==="/"?"*":`${M}
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      (function () {
+        var NAV_MARK = "data-codex-nav";
+        var CODex_LABEL = "Codex 配置";
+        var TARGET_HASH = "#/ai-providers";
+        function findNavLinkByText(text) {
+          var links = document.querySelectorAll("a");
+          for (var i = 0; i < links.length; i++) {
+            var t = (links[i].textContent || "").trim();
+            if (t === text) return links[i];
+          }
+          return null;
+        }
+        function setLinkLabel(link, text) {
+          var nodes = link.querySelectorAll("*");
+          var replaced = false;
+          for (var i = 0; i < nodes.length; i++) {
+            var t = (nodes[i].textContent || "").trim();
+            if (!t) continue;
+            if (!replaced) {
+              nodes[i].textContent = text;
+              replaced = true;
+            } else {
+              nodes[i].textContent = "";
+            }
+          }
+          if (!replaced) link.textContent = text;
+        }
+        function findCodexHeading() {
+          var headers = document.querySelectorAll("h1,h2,h3,h4,h5,div,section");
+          for (var i = 0; i < headers.length; i++) {
+            var t = (headers[i].textContent || "").trim();
+            if (/Codex\s*API\s*配置|Codex\s*配置|Codex/i.test(t)) return headers[i];
+          }
+          return null;
+        }
+        function gotoCodexConfig() {
+          if (location.hash !== TARGET_HASH) location.hash = TARGET_HASH;
+          var tries = 0;
+          var timer = setInterval(function () {
+            tries++;
+            var el = findCodexHeading();
+            if (el) {
+              clearInterval(timer);
+              el.scrollIntoView({ behavior: "smooth", block: "start" });
+            } else if (tries > 30) {
+              clearInterval(timer);
+            }
+          }, 300);
+        }
+        function ensureCodexNav() {
+          if (document.querySelector("[" + NAV_MARK + "='1']")) return;
+          var anchor = findNavLinkByText("配置管理") || findNavLinkByText("AI 提供商") || findNavLinkByText("仪表盘");
+          if (!anchor) return;
+          var clone = anchor.cloneNode(true);
+          clone.setAttribute(NAV_MARK, "1");
+          clone.setAttribute("href", TARGET_HASH);
+          setLinkLabel(clone, CODex_LABEL);
+          clone.addEventListener("click", function (event) {
+            event.preventDefault();
+            gotoCodexConfig();
+          });
+          anchor.insertAdjacentElement("afterend", clone);
+        }
+        function boot() {
+          ensureCodexNav();
+          var observer = new MutationObserver(function () {
+            ensureCodexNav();
+          });
+          observer.observe(document.body, { childList: true, subtree: true });
+        }
+        if (document.readyState === "loading") {
+          document.addEventListener("DOMContentLoaded", boot);
+        } else {
+          boot();
+        }
+      })();
+    </script>
   </body>
 </html>
