@@ -45,16 +45,24 @@ Please change the parent <Route path="${M}"> to <Route path="${M==="/"?"*":`${M}
     <div id="root"></div>
     <script>
       (function () {
+        window.__codexNavBoot = true;
         var NAV_MARK = "data-codex-nav";
         var CODex_LABEL = "Codex 配置";
         var TARGET_HASH = "#/ai-providers";
-        function findLabelNode(text) {
-          var nodes = document.querySelectorAll("a,button,li,div,span");
-          for (var i = 0; i < nodes.length; i++) {
-            var node = nodes[i];
-            var t = (node.textContent || "").trim();
-            if (t === text) return node;
+        function findTextNode(text, contains) {
+          if (!document.body || !window.NodeFilter) return null;
+          var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null);
+          var node;
+          while ((node = walker.nextNode())) {
+            var t = (node.nodeValue || "").trim();
+            if (!t) continue;
+            if (contains ? t.indexOf(text) !== -1 : t === text) return node;
           }
+          return null;
+        }
+        function findLabelNode(text) {
+          var node = findTextNode(text, false) || findTextNode(text, true);
+          if (node && node.parentElement) return node.parentElement;
           return null;
         }
         function findClickableAncestor(node) {
